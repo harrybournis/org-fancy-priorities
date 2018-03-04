@@ -25,9 +25,10 @@ the rest of the symbols following in descending priority.
 ``` emacs-lisp
 (use-package org-fancy-priorities
   :ensure t
+  :hook
+  (org-mode . org-fancy-priorities-mode)
   :config
-  (setq org-fancy-priorities-list '("⚡" "⬆" "⬇" "☕"))
-  (add-hook 'org-mode-hook 'org-fancy-priorities-mode))
+  (setq org-fancy-priorities-list '("⚡" "⬆" "⬇" "☕")))
 ```
 
 ## Customization
