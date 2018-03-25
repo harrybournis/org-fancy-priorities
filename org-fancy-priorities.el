@@ -4,7 +4,7 @@
 ;;
 ;; Author: Harry Bournis <harrybournis@gmail.com>
 ;; Created: 5 Feb 2018
-;; Version: 1.0
+;; Version: 1.1
 ;; Keywords: convenience faces outlines
 ;; Homepage: https://github.com/harrybournis/org-fancy-priorities
 ;;
@@ -61,7 +61,7 @@
 (defgroup org-fancy-priorities nil
   "Display org priorities as custom strings"
   :group 'org-appearance
-  :version "0.1")
+  :version "1.1")
 
 (defcustom org-fancy-priorities-list
   '("❗" "⬆" "⬇" "☕")
@@ -83,6 +83,14 @@ number, or you won't get the correct ascii value."
   :type '(choice (repeat :tag "Same symbols for all files" (string))
                  (repeat :tag "Custom symbol for each priority value" (cons integer string))))
 
+(defvar org-fancy-priorities-regex
+  ".*?\\(\\[#\\([A-Z0-9]\\)\\] ?\\)"
+  "The regex used to find org mode priorities.")
+
+(defvar org-fancy-priorities-overlay-list
+  '()
+  "Used to keep track of created overlays.")
+
 (defun org-fancy-priorities-get-value (priority)
   "Return the string that will appear instead of the PRIORITY arg.
 Return nil if a value has not been specified for this priority.
@@ -103,20 +111,32 @@ PRIORITY Is a string of just the priority value e.g. \"A\" \"B\" etc."
 
           (t (display-warning '(org-fancy-priorities) "Invalid org-fancy-priorities-list value" :error)))))
 
+(defun org-fancy-priorities-create-overlays ()
+  "Search with regex for priorities and add an overlay with their replacement string on their position."
+  (let (ol)
+    (while (re-search-forward org-fancy-priorities-regex nil t)
+      (setq ol (make-overlay (match-beginning 1) (- (match-end 1) 1)))
+      (overlay-put ol 'display (org-fancy-priorities-get-value (match-string 2)))
+      (push ol org-fancy-priorities-overlay-list))))
+
 ;;;###autoload
 (define-minor-mode org-fancy-priorities-mode
   "Customize the appearance of org-mode priorities.
 This mode does not alter your files in any way, it
 only changes the way that priorities are shown in your editor."
   nil " FancyPriorities" nil
-  (let ((keyword '((".*?\\(\\[#\\([A-Z0-9]\\)\\] ?\\)"
+  (let ((keyword `((,org-fancy-priorities-regex
                     (0 (progn
                          (let ((custom-priority (org-fancy-priorities-get-value (match-string 2))))
                            (put-text-property (match-beginning 1) (- (match-end 1) 1) 'display custom-priority)
                            nil)))))))
     (if org-fancy-priorities-mode
-        (font-lock-add-keywords nil keyword)
+        (progn
+          (add-hook 'org-agenda-finalize-hook 'org-fancy-priorities-create-overlays)
+          (font-lock-add-keywords nil keyword))
       (progn
+        (remove-hook 'org-agenda-finalize-hook 'org-fancy-priorities-create-overlays)
+        (dolist (ol org-fancy-priorities-overlay-list) (delete-overlay ol))
         (font-lock-remove-keywords nil keyword)
         (remove-text-properties (buffer-end -1) (buffer-end 1) '(display nil))))
     (with-no-warnings (font-lock-fontify-buffer))))
