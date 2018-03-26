@@ -13,8 +13,9 @@ heading as your preferred string value.
 
 ## Screenshots
 
-![Screenshot 1](screenshots/screenshot1.png?raw=true)
-![Screenshot 2](screenshots/screenshot2.png?raw=true)
+![Screenshot 1](./screenshots/screenshot1.png)
+![Screenshot 2](./screenshots/screenshot2.png)
+![Screenshot Agenda](./screenshots/screenshot-agenda.png)
 
 ## Installation
 
