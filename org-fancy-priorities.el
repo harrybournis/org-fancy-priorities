@@ -98,7 +98,7 @@ PRIORITY Is a string of just the priority value e.g. \"A\" \"B\" etc."
   (let ((priority-int (string-to-char priority)))
     ;; Check if org-fancy-priorities-list is a list of strings or alists
     (cond ((equal 'string (type-of (car org-fancy-priorities-list)))
-           (let ((index (- priority-int org-highest-priority)))
+           (let ((index (- priority-int org-priority-highest)))
              (if (< index (length org-fancy-priorities-list))
                  (nth index org-fancy-priorities-list)
                (format "[#%s]" priority))))
