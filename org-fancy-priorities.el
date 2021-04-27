@@ -124,7 +124,8 @@ PRIORITY Is a string of just the priority value e.g. \"A\" \"B\" etc."
   "Customize the appearance of org-mode priorities.
 This mode does not alter your files in any way, it
 only changes the way that priorities are shown in your editor."
-  nil " FancyPriorities" nil
+  :lighter " FancyPriorities"
+  :keymap nil
   (let ((keyword `((,org-fancy-priorities-regex
                     (0 (progn
                          (let ((custom-priority (org-fancy-priorities-get-value (match-string 2))))
