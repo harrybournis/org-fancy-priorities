@@ -113,11 +113,12 @@ PRIORITY Is a string of just the priority value e.g. \"A\" \"B\" etc."
 
 (defun org-fancy-priorities-create-overlays ()
   "Search with regex for priorities and add an overlay with their replacement string on their position."
-  (let (ol)
-    (while (re-search-forward org-fancy-priorities-regex nil t)
-      (setq ol (make-overlay (match-beginning 1) (- (match-end 1) 1)))
-      (overlay-put ol 'display (org-fancy-priorities-get-value (match-string 2)))
-      (push ol org-fancy-priorities-overlay-list))))
+  (save-excursion
+    (let (ol)
+      (while (re-search-forward org-fancy-priorities-regex nil t)
+	(setq ol (make-overlay (match-beginning 1) (- (match-end 1) 1)))
+	(overlay-put ol 'display (org-fancy-priorities-get-value (match-string 2)))
+	(push ol org-fancy-priorities-overlay-list)))))
 
 ;;;###autoload
 (define-minor-mode org-fancy-priorities-mode
